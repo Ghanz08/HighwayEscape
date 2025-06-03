@@ -31,9 +31,9 @@ A 2D top-down racing game created with Java Swing where you control a car and tr
 - `ObstacleCar.java`: Obstacle management (cars and trucks)
 - `AssetLoader.java`: Image loading and management
 
-## Screenshots
+<!-- ## Screenshots
 
-[Add screenshots here]
+[Add screenshots here] -->
 
 ## Requirements
 
