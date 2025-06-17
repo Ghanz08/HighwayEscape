@@ -2,15 +2,11 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class PlayerCar {
-    private int x;
-    private int y;
-    private int width;
-    private int height;
-    private int speed;
+    private int x, y, width, height, speed;
     private BufferedImage sprite;
-    private boolean isMovingLeft;
-    private boolean isMovingRight;
-    private int lastMoveDirection = 0; // 0 = none, -1 = left, 1 = right
+    private boolean isMovingLeft, isMovingRight, isMovingUp, isMovingDown;
+    private int lastMoveDirection = 0;
+    private int minY = 300, maxY = 650;
     
     /**
      * Constructor for PlayerCar
@@ -25,15 +21,14 @@ public class PlayerCar {
         this.sprite = AssetLoader.loadImage(AssetLoader.PLAYER_CAR);
         this.width = sprite.getWidth();
         this.height = sprite.getHeight();
-        this.isMovingLeft = false;
-        this.isMovingRight = false;
     }
     
     /**
      * Updates the player car position based on movement flags
      * @param gameWidth Width of the game panel
+     * @param gameHeight Height of the game panel
      */
-    public void update(int gameWidth) {
+    public void update(int gameWidth, int gameHeight) {
         lastMoveDirection = 0;
         
         if (isMovingLeft) {
@@ -44,14 +39,14 @@ public class PlayerCar {
             x += speed;
             lastMoveDirection = 1;
         }
+        if (isMovingUp) y -= speed;
+        if (isMovingDown) y += speed;
         
-        // Keep the car within the game bounds
-        if (x < 0) {
-            x = 0;
-        }
-        if (x + width > gameWidth) {
-            x = gameWidth - width;
-        }
+        // Bounds checking
+        if (x < 0) x = 0;
+        if (x + width > gameWidth) x = gameWidth - width;
+        if (y < minY) y = minY;
+        if (y + height > maxY) y = maxY - height;
     }
     
     /**
@@ -59,24 +54,26 @@ public class PlayerCar {
      * @param g2d Graphics2D object for rendering
      */
     public void render(Graphics2D g2d) {
-        // Draw skid marks if car is moving sideways
+        // Draw skid marks
         if (lastMoveDirection != 0) {
             g2d.setColor(Color.BLACK);
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f));
             
-            // Left tire skid mark
             if (lastMoveDirection < 0) {
                 g2d.fillRect(x + 10, y + height - 5, 5, 20);
-            }
-            // Right tire skid mark
-            else if (lastMoveDirection > 0) {
+            } else {
                 g2d.fillRect(x + width - 15, y + height - 5, 5, 20);
             }
             
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
         }
         
-        // Draw the car sprite
+        // Draw engine exhaust
+        if (isMovingUp) {
+            g2d.setColor(new Color(100, 100, 100, 100));
+            g2d.fillOval(x + width/2 - 5, y + height, 10, 15);
+        }
+        
         g2d.drawImage(sprite, x, y, null);
     }
     
@@ -88,28 +85,17 @@ public class PlayerCar {
         return new Rectangle(x, y, width, height);
     }
     
-    // Getters and setters
-    public void setMovingLeft(boolean isMovingLeft) {
-        this.isMovingLeft = isMovingLeft;
-    }
+    // Movement setters
+    public void setMovingLeft(boolean isMovingLeft) { this.isMovingLeft = isMovingLeft; }
+    public void setMovingRight(boolean isMovingRight) { this.isMovingRight = isMovingRight; }
+    public void setMovingUp(boolean isMovingUp) { this.isMovingUp = isMovingUp; }
+    public void setMovingDown(boolean isMovingDown) { this.isMovingDown = isMovingDown; }
     
-    public void setMovingRight(boolean isMovingRight) {
-        this.isMovingRight = isMovingRight;
-    }
-    
-    public int getX() {
-        return x;
-    }
-    
-    public int getY() {
-        return y;
-    }
-    
-    public int getWidth() {
-        return width;
-    }
-    
-    public int getHeight() {
-        return height;
-    }
+    // Getters
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public boolean isMovingForward() { return isMovingUp; }
+    public boolean isMovingBackward() { return isMovingDown; }
 }

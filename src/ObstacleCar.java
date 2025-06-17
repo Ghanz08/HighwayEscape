@@ -105,15 +105,41 @@ public class ObstacleCar {
         if (type == TYPE_CAR) {
             return new Rectangle(x, y, width, height);
         } else if (type == TYPE_TRUCK) {
-            // For truck, create a bounding box that includes cab and trailer with overlap
-            return new Rectangle(
-                x, 
-                trailerY, // Start from the trailer's top
-                width,
-                height // Use the adjusted height with overlap
-            );
+            // For truck, create separate collision boxes for cab and trailer
+            // Use the actual sprite dimensions, not the combined oversized rectangle
+            
+            // Get the actual dimensions of cab and trailer
+            int cabWidth = sprite.getWidth();
+            int cabHeight = sprite.getHeight();
+            int trailerWidth = trailerSprite.getWidth();
+            int trailerHeight = trailerSprite.getHeight();
+            
+            // Create collision rectangle that covers both cab and trailer precisely
+            // Start from the trailer (which is positioned above/behind the cab)
+            int topY = trailerY;
+            int bottomY = y + cabHeight;
+            int totalHeight = bottomY - topY;
+            int maxWidth = Math.max(cabWidth, trailerWidth);
+            
+            return new Rectangle(x, topY, maxWidth, totalHeight);
         }
         return new Rectangle(x, y, width, height);
+    }
+    
+    /**
+     * Get separate collision rectangles for more precise collision detection
+     * @return Array of rectangles representing each part of the vehicle
+     */
+    public Rectangle[] getDetailedBounds() {
+        if (type == TYPE_CAR) {
+            return new Rectangle[]{new Rectangle(x, y, sprite.getWidth(), sprite.getHeight())};
+        } else if (type == TYPE_TRUCK) {
+            // Return separate rectangles for cab and trailer
+            Rectangle cabBounds = new Rectangle(x, y, sprite.getWidth(), sprite.getHeight());
+            Rectangle trailerBounds = new Rectangle(x, trailerY, trailerSprite.getWidth(), trailerSprite.getHeight());
+            return new Rectangle[]{cabBounds, trailerBounds};
+        }
+        return new Rectangle[]{new Rectangle(x, y, width, height)};
     }
     
     // Getters and setters

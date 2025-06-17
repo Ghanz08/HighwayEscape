@@ -36,7 +36,7 @@ public class GameFrame extends JFrame {
         mainPanel.add(gamePanel, GAME_PANEL);
         
         // Show start menu initially
-        cardLayout.show(mainPanel, START_MENU_PANEL);
+        showStartMenu();
         
         // Add main panel to frame
         add(mainPanel);
@@ -49,19 +49,24 @@ public class GameFrame extends JFrame {
     }
     
     /**
+     * Show the start menu
+     */
+    private void showStartMenu() {
+        // Stop any game music
+        SoundManager.getInstance().stopAllMusic();
+        
+        cardLayout.show(mainPanel, START_MENU_PANEL);
+        startMenuPanel.requestFocusInWindow();
+        
+        // No menu music - keep silent in menu
+    }
+    
+    /**
      * Start the game
      */
     private void startGame() {
         gamePanel.initGame();
         cardLayout.show(mainPanel, GAME_PANEL);
         gamePanel.requestFocusInWindow(); // Important for keyboard input
-    }
-    
-    /**
-     * Show the start menu
-     */
-    private void showStartMenu() {
-        cardLayout.show(mainPanel, START_MENU_PANEL);
-        startMenuPanel.requestFocusInWindow();
     }
 }
